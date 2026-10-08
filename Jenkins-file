@@ -1,0 +1,36 @@
+pipeline {
+    agent {
+        node {
+            label 'prod'
+        }
+    }
+    
+    tools {
+        maven 'mymaven'
+    }
+    
+    stages {
+        stage('get the code') {
+            steps {
+                git 'https://github.com/YadlapatiDileep/dockerwebappnew.git'
+            }
+        }
+        
+        stage('build the code') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+        
+        stage('CQA') {
+            steps {
+             withSonarQubeEnv('mysonar') {
+               //   sh "mvn clean verify sonar:sonar -Dsonar.projectKey=myproject-1"
+                  sh "mvn clean verify sonar:sonar -Dsonar.projectKey=myproject-1"
+             }
+                // withSonarQubeEnv('mysonar') {
+                //sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=sonarproject -Dsonar.projectName='myproject'"
+            }
+        }
+    }
+}
